@@ -1,4 +1,4 @@
-// Terapkan tema sedini mungkin agar tidak berkedip
+// Menerapkan tema sedini mungkin agar tidak berkedip
 (function () {
   const t = localStorage.getItem('tema') || 'light';
   document.documentElement.setAttribute('data-bs-theme', t);
@@ -37,28 +37,47 @@ document.addEventListener('DOMContentLoaded', function () {
     });
   }
 
-  // 4. Validasi form + tombol loading saat submit
+  // 4. Validasi form (hanya tanda merah, tanpa centang hijau) + tombol loading
   document.querySelectorAll('.needs-validation').forEach(function (form) {
+    const fields = form.querySelectorAll('input, select, textarea');
+
+    // Tanda merah hilang begitu isian sudah benar
+    fields.forEach(function (f) {
+      ['input', 'change'].forEach(function (ev) {
+        f.addEventListener(ev, function () {
+          if (f.classList.contains('is-invalid') && f.checkValidity()) {
+            f.classList.remove('is-invalid');
+          }
+        });
+      });
+    });
+
     form.addEventListener('submit', function (e) {
       if (!form.checkValidity()) {
         e.preventDefault();
         e.stopPropagation();
-      } else {
-        const btn = form.querySelector('button[type="submit"], button:not([type])');
-        if (btn) {
-          setTimeout(function () {
-            btn.disabled = true;
-            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
-          }, 0);
-        }
+        fields.forEach(function (f) {
+          f.classList.toggle('is-invalid', !f.checkValidity());
+        });
+        const pertama = form.querySelector('.is-invalid');
+        if (pertama) pertama.focus();
+        return;
       }
-      form.classList.add('was-validated');
+      // Form valid: tombol berubah jadi loading
+      const btn = form.querySelector('button[type="submit"], button:not([type])');
+      if (btn) {
+        setTimeout(function () {
+          btn.disabled = true;
+          btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Memproses...';
+        }, 0);
+      }
     });
   });
 
   // 5. Preview sampul + drag & drop
   const inputSampul = document.getElementById('sampul');
   const preview = document.getElementById('preview');
+
   function tampilkanFile(f) {
     if (!f) return;
     if (!['image/jpeg', 'image/png'].includes(f.type)) {
@@ -74,13 +93,28 @@ document.addEventListener('DOMContentLoaded', function () {
     preview.src = URL.createObjectURL(f);
     const nama = document.getElementById('namaFile');
     if (nama) nama.textContent = f.name;
+    inputSampul.classList.remove('is-invalid');
   }
+
   if (inputSampul && preview) {
-    inputSampul.addEventListener('change', () => tampilkanFile(inputSampul.files[0]));
+    inputSampul.addEventListener('change', function () {
+      tampilkanFile(inputSampul.files[0]);
+    });
+
     const dz = document.querySelector('.dropzone');
     if (dz) {
-      ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.add('dragover'); }));
-      ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => { e.preventDefault(); dz.classList.remove('dragover'); }));
+      ['dragenter', 'dragover'].forEach(function (ev) {
+        dz.addEventListener(ev, function (e) {
+          e.preventDefault();
+          dz.classList.add('dragover');
+        });
+      });
+      ['dragleave', 'drop'].forEach(function (ev) {
+        dz.addEventListener(ev, function (e) {
+          e.preventDefault();
+          dz.classList.remove('dragover');
+        });
+      });
       dz.addEventListener('drop', function (e) {
         if (e.dataTransfer.files.length) {
           inputSampul.files = e.dataTransfer.files;
@@ -111,6 +145,7 @@ document.addEventListener('DOMContentLoaded', function () {
   // 8. Pencarian + filter status
   const cari = document.getElementById('cari');
   const filterStatus = document.getElementById('filterStatus');
+
   function terapkanFilter() {
     const q = cari ? cari.value.toLowerCase() : '';
     const st = filterStatus ? filterStatus.value : '';
@@ -144,10 +179,30 @@ document.addEventListener('DOMContentLoaded', function () {
   if (toastEl) new bootstrap.Toast(toastEl).show();
 
   // 11. Tooltip Bootstrap
-  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(el => new bootstrap.Tooltip(el));
+  document.querySelectorAll('[data-bs-toggle="tooltip"]').forEach(function (el) {
+    new bootstrap.Tooltip(el);
+  });
 
   // 12. Alert hilang otomatis setelah 4 detik
   document.querySelectorAll('.alert-auto').forEach(function (a) {
-    setTimeout(() => bootstrap.Alert.getOrCreateInstance(a).close(), 4000);
+    setTimeout(function () {
+      bootstrap.Alert.getOrCreateInstance(a).close();
+    }, 4000);
   });
+
+  // 13. Label status otomatis dari stok (form tambah & edit)
+  const inputStok = document.getElementById('stok');
+  const infoStatus = document.getElementById('infoStatus');
+
+  function updateStatus() {
+    if (!inputStok || !infoStatus) return;
+    const ada = parseInt(inputStok.value, 10) > 0;
+    infoStatus.className = 'badge fs-6 text-bg-' + (ada ? 'success' : 'warning');
+    infoStatus.textContent = ada ? 'Tersedia' : 'Dipinjam';
+  }
+  if (inputStok) {
+    inputStok.addEventListener('input', updateStatus);
+    updateStatus();
+  }
+
 });

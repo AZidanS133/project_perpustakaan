@@ -1,14 +1,14 @@
 <?php
 require 'config/koneksi.php';
 
-// Kalau sudah login, langsung ke dashboard
+// Proses login
 if (!empty($_SESSION['login'])) {
     header('Location: dashboard.php');
     exit;
 }
 
 $flash = get_flash();
-// Username dari cookie "Remember Me" (jika ada)
+// Username dari cookie "Remember Me"
 $username_cookie = $_COOKIE['remember_username'] ?? '';
 ?>
 <!DOCTYPE html>
@@ -37,8 +37,8 @@ $username_cookie = $_COOKIE['remember_username'] ?? '';
         <div class="card-body p-4 pt-0">
 
           <div class="brand-icon"><i class="bi bi-book-half"></i></div>
-          <h4 class="text-center fw-bold mb-0">Mini DigitalLibrary</h4>
-          <p class="text-center text-body-secondary small mb-4">Silakan masuk untuk melanjutkan</p>
+          <h4 class="text-center fw-bold mb-0">Project DigitalLibrary</h4>
+          <p class="text-center text-body-secondary small mb-4">Silahkan Masuk Untuk Melanjutkan</p>
 
           <?php if ($flash): ?>
             <div class="alert alert-<?= e($flash['type']) ?> alert-dismissible alert-auto py-2 small" role="alert">
@@ -48,23 +48,25 @@ $username_cookie = $_COOKIE['remember_username'] ?? '';
           <?php endif; ?>
 
           <form action="proses_login.php" method="POST" class="needs-validation" novalidate>
+
             <div class="mb-3">
-              <label class="form-label">Username</label>
+              <label class="form-label" for="username">Username</label>
               <div class="input-group has-validation">
                 <span class="input-group-text"><i class="bi bi-person"></i></span>
-                <input type="text" name="username" class="form-control"
-                       value="<?= e($username_cookie) ?>" required autofocus>
+                <input type="text" name="username" id="username" class="form-control"
+                       value="<?= e($username_cookie) ?>" autocomplete="username" required autofocus>
                 <div class="invalid-feedback">Username wajib diisi.</div>
               </div>
             </div>
 
             <div class="mb-3">
-              <label class="form-label">Password</label>
+              <label class="form-label" for="password">Password</label>
               <div class="input-group has-validation">
                 <span class="input-group-text"><i class="bi bi-lock"></i></span>
-                <input type="password" name="password" id="password" class="form-control" required>
+                <input type="password" name="password" id="password" class="form-control"
+                       minlength="6" autocomplete="current-password" required>
                 <button class="btn btn-outline-secondary" type="button" id="togglePw"><i class="bi bi-eye"></i></button>
-                <div class="invalid-feedback">Password wajib diisi.</div>
+                <div class="invalid-feedback">Password wajib diisi (minimal 6 karakter).</div>
               </div>
             </div>
 
@@ -79,7 +81,6 @@ $username_cookie = $_COOKIE['remember_username'] ?? '';
             </button>
           </form>
 
-          <p class="text-center text-body-secondary small mt-3 mb-0">Demo: admin / admin123</p>
         </div>
       </div>
     </div>
