@@ -10,7 +10,7 @@ Aplikasi web perpustakaan mini untuk mengelola data buku: login dengan session d
 | **Mata Kuliah** | Pemrograman Web |
 | **Tugas** | Pengembangan Sistem Informasi Perpustakaan Digital Mini |
 
-- **Video demo:** [isi tautan video demo]
+- **Video demo:** https://youtu.be/mApgAnE3YBs?si=cckSm2BI2_7RA-NC
 
 ---
 
@@ -231,7 +231,7 @@ Warna badge ditentukan oleh `warna_status()` dengan `switch`.
 1. **Ambil kode**
 
    ```bash
-   git clone https://github.com/USERNAME_KAMU/NAMA_REPO.git
+   git clone https://github.com/AZidanS133/project_perpustakaan.git
    ```
 
    Pindahkan folder proyek ke `C:\xampp\htdocs\project_perpustakaan`.
